@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:untitled/model.dart';
 
@@ -12,7 +14,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -36,68 +37,254 @@ class QuestionWidget extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<QuestionWidget> creteState() => _QuestionWidgetState();
-
-  @override
-  State<StatefulWidget> createState() {
-    // TODO: implement createState
-    throw UnimplementedError();
-  }
+  State<QuestionWidget> createState() => _QuestionWidgetState();
 }
 
 class _QuestionWidgetState extends State<QuestionWidget> {
+  late PageController _controller;
   int _questionNumber = 1;
+  int _score = 0;
+  bool _isLocked = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = PageController(initialPage: 0);
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          const SizedBox(height: 32),
-          Text('Question $_questionNumber'),
-          const Divider(
-            thickness: 1,
-            color: Colors.grey,
+    Color unSelectedColor = const Color(0xFFB7B7B7);
+    Color selectedColor = const Color(0xFFF16E01);
+    Color whiteColor = const Color(0xFFFFFFFF);
+
+    return MaterialApp(
+      home: Container(
+        child: Scaffold(
+          appBar: AppBar(
+            backgroundColor: Colors.white,
+            leading: IconButton(
+              icon: Icon(Icons.arrow_back, color: Colors.black),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            title: const Text(
+              "Fawanees Challenge",
+              style:
+              TextStyle(color: Colors.black, fontWeight: FontWeight.w700),
+            ),
+            elevation: 0,
           ),
-          Expanded(
-              child: PageView.builder(
-                itemCount: questions.length,
-                physics: const NeverScrollableScrollPhysics(),
-                itemBuilder: (context, index) {
-                  final _qestion = questions[index];
-                  return buildQuestion(_qestion);
-                },
-              ))
-        ],
+          body: Container(
+            decoration: const BoxDecoration(
+                color: Colors.white,
+                image: DecorationImage(
+                    fit: BoxFit.fill,
+                    image: AssetImage('assets/images/bg_athkar.png'))),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Header(numberOfDay: 2),
+                const SizedBox(height: 32),
+                Expanded(child: ListViewStateFull(setElevatedButton)),
+                Padding(
+                  padding:
+                  const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                  child: Center(
+                    child: ConstrainedBox(
+                        constraints: const BoxConstraints(
+                            minWidth: double.infinity, minHeight: 34),
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            foregroundColor: Colors.white,
+                            //change background color of button
+                            backgroundColor:
+                            questions.isUnLocked
+                                ? selectedColor
+                                : unSelectedColor,
+                            //change text color of button
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                          ),
+                          onPressed: () {
+                            if (!questions.isUnLocked) {}
+                            else
+                              chid.show
+                              },
+                          child: const Text('Confirm'),
+                        )),
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+              ],
+            ),
+          ),
+        ),
       ),
     );
     throw UnimplementedError();
   }
 
-  Column buildQuestion(Question question) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const SizedBox(height: 32),
-        Text(question.text, style: const TextStyle(fontSize: 25)),
-        const SizedBox(height: 32),
-        Expanded(
-            child: OptionsWidget(
-              question: question,
-              onClickedOption: (option) {
-                if (question.isLocked) {
-                  return;
-                } else {
-                  setState(() {
-                    question.isLocked = true;
-                    question.selectdOption = option;
-                  });
-                }
-              },
-            ))
-      ],
+  void setElevatedButton() {
+    setState(() {
+      questions.isUnLocked = true;
+    });
+  }
+
+  ElevatedButton buildElevatedButton() {
+    return ElevatedButton(
+      onPressed: () {
+        if (_questionNumber < questions.options.length) {
+          _controller.nextPage(
+            duration: const Duration(microseconds: 250),
+            curve: Curves.easeInExpo,
+          );
+          setState(() {
+            _questionNumber++;
+            _isLocked = false;
+          });
+        } else {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ResultPage(score: _score),
+            ),
+          );
+        }
+      },
+      child: Text(_questionNumber < questions.options.length ? 'Next' : 'See'),
+    );
+  }
+}
+
+class Header extends StatelessWidget {
+  Header({Key? key, required this.numberOfDay}) : super(key: key);
+  int numberOfDay = 1;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+        padding: const EdgeInsets.only(right: 0, left: 0, top: 15, bottom: 15),
+        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Image.asset(
+            'assets/images/artwork_fawanees.png',
+            width: 100,
+            height: 100,
+          ),
+          Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(
+              "Day $numberOfDay",
+              style: const TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 19),
+            ),
+            const Padding(
+              padding: EdgeInsets.all(10), //apply padding to all four sides
+            ),
+            const Text(
+              "is simply dummy text of the \nprinting and typesetting industry ?",
+              style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.normal,
+                  fontSize: 17),
+            )
+          ]),
+        ]));
+  }
+}
+
+class ListViewStateFull extends StatefulWidget {
+  ListViewStateFull(this.setElevatedButton, {Key? key}) : super(key: key);
+  final Function setElevatedButton;
+
+  @override
+  ListViewHome createState() => ListViewHome();
+}
+
+class ListViewHome extends State<ListViewStateFull> {
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  int _selectedIndex = -1;
+  Color selectedColor = const Color(0xFFB7B7B7);
+  Color unSelectedColor = const Color(0xFFE0E0E0);
+
+  _onSelected(int index) {
+    setState(() => _selectedIndex = index);
+    widget.setElevatedButton();
+    questions.isUnLocked = _selectedIndex != null && _selectedIndex == index;
+  }
+  showAnswer(int index) {
+    setState(() => _selectedIndex = index);
+    widget.setElevatedButton();
+    questions.isUnLocked = _selectedIndex != null && _selectedIndex == index;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Padding(
+        padding: const EdgeInsets.all(0.0),
+        child: ListView.builder(
+          itemCount: questions.options.length,
+          itemBuilder: (context, index) =>
+              Container(
+                height: _selectedIndex != null && _selectedIndex == index
+                    ? 65
+                    : 45,
+                margin:
+                const EdgeInsets.only(top: 10, bottom: 10, left: 15, right: 15),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: _selectedIndex != null && _selectedIndex == index
+                      ? selectedColor
+                      : unSelectedColor,
+                ),
+                child: ListTile(
+                  title: Align(
+                    alignment: const Alignment(-0.9, -0.2),
+                    child: Text(
+                      questions.options[index].text,
+                    ),
+                  ),
+                  onTap: () => _onSelected(index),
+                ),
+              ),
+        ),
+      ),
+    );
+  }
+
+  getIconForOption(Option option, Question question) {
+    final isSelected = option == question.selectdOption;
+    if (question.isUnLocked) {
+      if (isSelected) {
+        return option.isCorrect
+            ? const Icon(Icons.check_circle, color: Colors.green)
+            : const Icon(Icons.cancel, color: Colors.red);
+      } else if (option.isCorrect) {
+        return const Icon(Icons.check_circle, color: Colors.green);
+      }
+    }
+    return const SizedBox.shrink();
+  }
+}
+
+class ResultPage extends StatelessWidget {
+  const ResultPage({Key? key, required this.score}) : super(key: key);
+  final int score;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Text('you got $score/${questions.options.length}'),
+      ),
     );
   }
 }
@@ -105,24 +292,25 @@ class _QuestionWidgetState extends State<QuestionWidget> {
 class OptionsWidget extends StatelessWidget {
   final Question question;
   final ValueChanged<Option> onClickedOption;
+  double height = 50;
 
-  const OptionsWidget({
-    Key? key,
+  OptionsWidget({Key? key,
     required this.question,
     required this.onClickedOption,
-  }) : super(key: key);
+    required this.height})
+      : super(key: key);
 
   buildOption(BuildContext context, Option option) {
     final color = getColorForOption(option, question);
     return GestureDetector(
-        onTap: () => onClickedOption(option),
+        onTap: () => {onClickedOption(option)},
         child: Container(
           height: 50,
           padding: const EdgeInsets.all(12),
           margin: const EdgeInsets.symmetric(vertical: 8),
           decoration: BoxDecoration(
               color: Colors.grey.shade200,
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(20),
               border: Border.all(color: Colors.grey)),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -130,7 +318,7 @@ class OptionsWidget extends StatelessWidget {
               Text(
                 option.text,
                 style: const TextStyle(fontSize: 20),
-              )
+              ),
               getIconForOption(option, question)
             ],
           ),
@@ -159,7 +347,7 @@ class OptionsWidget extends StatelessWidget {
 
   getIconForOption(Option option, Question question) {
     final isSelected = option == question.selectdOption;
-    if (question.isLocked) {
+    if (question.isUnLocked) {
       if (isSelected) {
         return option.isCorrect
             ? const Icon(Icons.check_circle, color: Colors.green)
@@ -169,93 +357,5 @@ class OptionsWidget extends StatelessWidget {
       }
     }
     return const SizedBox.shrink();
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme
-                  .of(context)
-                  .textTheme
-                  .headlineMedium,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
-    );
   }
 }
