@@ -1,6 +1,7 @@
 import 'dart:ffi';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:untitled/model.dart';
 
 void main() {
@@ -70,7 +71,7 @@ class _QuestionWidgetState extends State<QuestionWidget> {
             title: const Text(
               "Fawanees Challenge",
               style:
-              TextStyle(color: Colors.black, fontWeight: FontWeight.w700),
+                  TextStyle(color: Colors.black, fontWeight: FontWeight.w700),
             ),
             elevation: 0,
           ),
@@ -86,37 +87,33 @@ class _QuestionWidgetState extends State<QuestionWidget> {
                 Header(numberOfDay: 2),
                 const SizedBox(height: 32),
                 Expanded(child: ListViewStateFull(setElevatedButton)),
-                Padding(
-                  padding:
-                  const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                  child: Center(
-                    child: ConstrainedBox(
-                        constraints: const BoxConstraints(
-                            minWidth: double.infinity, minHeight: 34),
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            foregroundColor: Colors.white,
-                            //change background color of button
-                            backgroundColor:
-                            questions.isUnLocked
-                                ? selectedColor
-                                : unSelectedColor,
-                            //change text color of button
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(5),
-                            ),
-                          ),
-                          onPressed: () {
-                            if (!questions.isUnLocked) {}
-                            else
-                              chid.show
-                              },
-                          child: const Text('Confirm'),
-                        )),
-                  ),
-                ),
-
-                const SizedBox(height: 20),
+                // Padding(
+                //   padding:
+                //       const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                //   child: Center(
+                //     child: ConstrainedBox(
+                //         constraints: const BoxConstraints(
+                //             minWidth: double.infinity, minHeight: 34),
+                //         child: ElevatedButton(
+                //           style: ElevatedButton.styleFrom(
+                //             foregroundColor: Colors.white,
+                //             //change background color of button
+                //             backgroundColor: questions.isUnLocked
+                //                 ? selectedColor
+                //                 : unSelectedColor,
+                //             //change text color of button
+                //             shape: RoundedRectangleBorder(
+                //               borderRadius: BorderRadius.circular(5),
+                //             ),
+                //           ),
+                //           onPressed: () {
+                //             if (!questions.isUnLocked) {
+                //             } else {}
+                //           },
+                //           child: const Text('Confirm'),
+                //         )),
+                //   ),
+                // ),
               ],
             ),
           ),
@@ -204,58 +201,146 @@ class ListViewStateFull extends StatefulWidget {
 }
 
 class ListViewHome extends State<ListViewStateFull> {
-
   @override
   void initState() {
     super.initState();
   }
 
   int _selectedIndex = -1;
+  bool? isCorrect = null;
   Color selectedColor = const Color(0xFFB7B7B7);
+  Color selectedColorGreen = const Color(0xFF55DD53);
+  Color selectedColorOrange = const Color(0xFFF16E01);
+  Color selectedColorRed = const Color(0xFFF03434);
   Color unSelectedColor = const Color(0xFFE0E0E0);
 
   _onSelected(int index) {
     setState(() => _selectedIndex = index);
     widget.setElevatedButton();
-    questions.isUnLocked = _selectedIndex != null && _selectedIndex == index;
-  }
-  showAnswer(int index) {
-    setState(() => _selectedIndex = index);
-    widget.setElevatedButton();
-    questions.isUnLocked = _selectedIndex != null && _selectedIndex == index;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(0.0),
-        child: ListView.builder(
-          itemCount: questions.options.length,
-          itemBuilder: (context, index) =>
-              Container(
-                height: _selectedIndex != null && _selectedIndex == index
-                    ? 65
-                    : 45,
-                margin:
-                const EdgeInsets.only(top: 10, bottom: 10, left: 15, right: 15),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: _selectedIndex != null && _selectedIndex == index
-                      ? selectedColor
-                      : unSelectedColor,
-                ),
-                child: ListTile(
-                  title: Align(
-                    alignment: const Alignment(-0.9, -0.2),
-                    child: Text(
-                      questions.options[index].text,
+      body: Column(
+        children: [
+          Expanded(
+            child: ListView.builder(
+              itemCount: questions.options.length,
+              itemBuilder: (context, index) {
+                return GestureDetector(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Container(
+                      height: _selectedIndex != null && _selectedIndex == index
+                          ? 65
+                          : 45,
+                      // child: _selectedIndex != null &&
+                      // _selectedIndex == index &&
+                      // isCorrect != null &&
+                      // isCorrect!
+                      //     ? Icon(Icons.check_circle, color: Colors.green)
+                      //     : _selectedIndex != null &&
+                      //     _selectedIndex == index &&
+                      //     isCorrect != null &&
+                      //     !isCorrect!
+                      // ? Icon(Icons.check_circle, color: Colors.red)
+                      // : null,
+                      margin: const EdgeInsets.only(
+                          top: 10, bottom: 10, left: 15, right: 15),
+
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: _selectedIndex != null &&
+                                  _selectedIndex == index &&
+                                  isCorrect != null &&
+                                  isCorrect!
+                              ? selectedColorGreen
+                              : _selectedIndex != null &&
+                                      _selectedIndex == index &&
+                                      isCorrect == null
+                                  ? unSelectedColor
+                                  : _selectedIndex != null &&
+                                          _selectedIndex == index &&
+                                          isCorrect != null &&
+                                          !isCorrect!
+                                      ? selectedColorRed
+                                      : unSelectedColor),
+                      child: ListTile(
+                        leading: ConstrainedBox(
+                          constraints: const BoxConstraints(
+                            minWidth: 20,
+                            minHeight: 20,
+                            maxWidth: 20,
+                            maxHeight: 20,
+                          ),
+                          child: _selectedIndex != null &&
+                                  _selectedIndex == index &&
+                                  isCorrect != null &&
+                                  isCorrect!
+                              ? Image.asset('assets/images/icon_correct.jpg',
+                                  fit: BoxFit.fill)
+                              : _selectedIndex != null &&
+                                      _selectedIndex == index &&
+                                      isCorrect != null &&
+                                      !isCorrect!
+                                  ? Image.asset('assets/images/wrong.png',
+                                      fit: BoxFit.fill)
+                                  : null,
+                        ),
+                        // No matter how big it is, it won't overflow
+                        title: Align(
+                          alignment: const Alignment(-0.9, -0.2),
+                          child: Text(
+                            questions.options[index].text,
+                          ),
+                        ),
+                        onTap: () => _onSelected(index),
+                      ),
                     ),
                   ),
-                  onTap: () => _onSelected(index),
-                ),
-              ),
-        ),
+                );
+              },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 10),
+            child: Center(
+              child: ConstrainedBox(
+                  constraints: const BoxConstraints(
+                      minWidth: double.infinity, minHeight: 34),
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      //change background color of button
+                      backgroundColor:
+                          (_selectedIndex != null && _selectedIndex != -1)
+                              ? selectedColorOrange
+                              : unSelectedColor,
+                      //change text color of button
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                    ),
+                    onPressed: () {
+                      if (!questions.isUnLocked) {
+                      } else {
+                        if (questions.options[_selectedIndex].isCorrect) {
+                          setState(() {
+                            isCorrect = true;
+                          });
+                        } else {
+                          setState(() {
+                            isCorrect = false;
+                          });
+                        }
+                      }
+                    },
+                    child: const Text('Confirm'),
+                  )),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -294,10 +379,11 @@ class OptionsWidget extends StatelessWidget {
   final ValueChanged<Option> onClickedOption;
   double height = 50;
 
-  OptionsWidget({Key? key,
-    required this.question,
-    required this.onClickedOption,
-    required this.height})
+  OptionsWidget(
+      {Key? key,
+      required this.question,
+      required this.onClickedOption,
+      required this.height})
       : super(key: key);
 
   buildOption(BuildContext context, Option option) {
@@ -326,8 +412,7 @@ class OptionsWidget extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) =>
-      SingleChildScrollView(
+  Widget build(BuildContext context) => SingleChildScrollView(
         child: Column(
           children: question.options
               .map<Widget>((option) => buildOption(context, option))
