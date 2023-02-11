@@ -31,8 +31,8 @@ final questions = Question(
     text: 'What is Ramadan?>',
     options: [
       const Option(text: "Answer 1", isCorrect: false, height: 50),
-      const Option(text: "Answer 2", isCorrect: false, height: 50),
       const Option(text: "Answer 2", isCorrect: true, height: 50),
-      const Option(text: "Answer 3", isCorrect: false, height: 50),
+      const Option(text: "Answer 3", isCorrect: true, height: 50),
+      const Option(text: "Answer 4", isCorrect: false, height: 50),
     ],
     height: 50);
