@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -173,7 +172,7 @@ class ListViewHome extends State<ListViewStateFull> {
 
   Color selectedColorOrange = const Color(0xFFF16E01);
   Color selectedColorRed = const Color(0xFFF03434);
-  Color unSelectedColor = const Color(0xFFE0E0E0);
+  Color unSelectedColor = const Color(0xFFFFFFFF);
 
   _onSelected(int index) {
     setState(() => _selectedIndex = index);
@@ -183,6 +182,7 @@ class ListViewHome extends State<ListViewStateFull> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.transparent,
       body: Column(
         children: [
           Expanded(
@@ -197,15 +197,18 @@ class ListViewHome extends State<ListViewStateFull> {
                   child: AbsorbPointer(
                     absorbing: isScreenBlocked,
                     child: Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.all(2.0),
                       child: Container(
-                        height:
-                            _selectedIndex != null && _selectedIndex == index
-                                ? 65
-                                : 45,
+                        height: 60,
                         margin: const EdgeInsets.only(
                             top: 10, bottom: 10, left: 15, right: 15),
                         decoration: BoxDecoration(
+                            boxShadow: const [
+                              BoxShadow(
+                                  color: Color(0x19000000),
+                                  blurRadius: 10,
+                                  offset: Offset(0, 2))
+                            ],
                             border: Border.all(
                                 color: _selectedIndex != null &&
                                         _selectedIndex == index &&
@@ -254,7 +257,16 @@ class ListViewHome extends State<ListViewStateFull> {
                                         !isCorrect!
                                     ? Image.asset('assets/images/wrong.png',
                                         fit: BoxFit.fill)
-                                    : null,
+                                    :RadioListTile<SingingCharacter>(
+                              title: const Text('Thomas Jefferson'),
+                              value: SingingCharacter.jefferson,
+                              groupValue: _character,
+                              onChanged: (SingingCharacter? value) {
+                                setState(() {
+                                  _character = value;
+                                });
+                              },
+                            ),
                           ),
                           // No matter how big it is, it won't overflow
                           title: Align(
@@ -283,262 +295,277 @@ class ListViewHome extends State<ListViewStateFull> {
               },
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 10),
-            child: Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(
-                    minWidth: double.infinity, minHeight: 34),
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    //change background color of button
-                    backgroundColor:
-                        (_selectedIndex != null && _selectedIndex != -1)
-                            ? selectedColorOrange
-                            : unSelectedColor,
-                    //change text color of button
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(5),
+          AbsorbPointer(
+            absorbing: isScreenBlocked,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 10),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(
+                      minWidth: double.infinity, minHeight: 34),
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      //change background color of button
+                      backgroundColor:
+                          (_selectedIndex != null && _selectedIndex != -1)
+                              ? selectedColorOrange
+                              : unSelectedColor,
+                      //change text color of button
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5),
+                      ),
                     ),
-                  ),
-                  onPressed: () {
-                    if (!questions.isUnLocked) {
-                    } else {
-                      if (questions.options[_selectedIndex].isCorrect) {
-                        setState(() {
-                          isScreenBlocked = true;
-                          isCorrect = true;
-                          preSelected = true;
-                        });
-                        Timer(const Duration(seconds: 2), () {
-                          setState(() {
-                            preSelected = false;
-                          });
-                        });
-
-                        Timer(const Duration(seconds: 3), () {
-                          showModalBottomSheet<void>(
-                            context: context,
-                            enableDrag: true,
-                            isDismissible: false,
-                            shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.vertical(
-                                top: Radius.circular(25.0),
-                              ),
-                            ),
-                            builder: (BuildContext context) {
-                              return SizedBox(
-                                height: 300,
-                                child: Center(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: <Widget>[
-                                      const Padding(
-                                          padding: EdgeInsets.all(10)),
-                                      Image.asset(
-                                        'assets/images/artwork_fawanees.png',
-                                        width: 65,
-                                        height: 65,
-                                      ),
-                                      const Padding(
-                                          padding: EdgeInsets.all(10)),
-                                      const Text(
-                                        'Correct Answer',
-                                        style: TextStyle(
-                                          fontSize: 24,
-                                          color: Colors.greenAccent,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      const Padding(padding: EdgeInsets.all(2)),
-                                      const Text(
-                                        'New Fanows had been added \nfor you',
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                          fontSize: 17,
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.normal,
-                                        ),
-                                      ),
-                                      const Padding(padding: EdgeInsets.all(2)),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 2, horizontal: 7),
-                                        child: Center(
-                                          child: ConstrainedBox(
-                                            constraints: const BoxConstraints(
-                                                minWidth: double.infinity,
-                                                minHeight: 34),
-                                            child: OutlinedButton(
-                                              style: ElevatedButton.styleFrom(
-                                                foregroundColor: Colors.white,
-                                                side: const BorderSide(
-                                                    width: 1.0),
-                                                //change background color of button
-                                                //change text color of button
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(5),
-                                                ),
-                                              ),
-                                              child: const Text(
-                                                'REDEEM FAWANEES',
-                                                style: TextStyle(
-                                                  color: Colors.black,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                              onPressed: () =>
-                                                  Navigator.pop(context),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 2, horizontal: 10),
-                                        child: Center(
-                                          child: ConstrainedBox(
-                                            constraints: const BoxConstraints(
-                                                minWidth: double.infinity,
-                                                minHeight: 34),
-                                            child: ElevatedButton(
-                                              style: ElevatedButton.styleFrom(
-                                                foregroundColor: Colors.white,
-                                                backgroundColor:
-                                                    selectedColorOrange,
-                                                //change background color of button
-                                                //change text color of button
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(5),
-                                                ),
-                                              ),
-                                              child: const Text(
-                                                'Done',
-                                                style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                              onPressed: () =>
-                                                  Navigator.pop(context),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            },
-                          );
-                        });
+                    onPressed: () {
+                      if (!questions.isUnLocked) {
                       } else {
-                        setState(() {
-                          isCorrect = false;
-                          showBottomSheet(
+                        if (questions.options[_selectedIndex].isCorrect) {
+                          setState(() {
+                            isScreenBlocked = true;
+                            isCorrect = true;
+                            preSelected = true;
+                          });
+                          Timer(const Duration(seconds: 2), () {
+                            setState(() {
+                              preSelected = false;
+                            });
+                          });
+
+                          Timer(const Duration(seconds: 3), () {
+                            showModalBottomSheet<void>(
+                              context: context,
+                              enableDrag: true,
+                              isDismissible: false,
                               shape: const RoundedRectangleBorder(
                                 borderRadius: BorderRadius.vertical(
-                                  top: Radius.circular(20),
+                                  top: Radius.circular(25.0),
                                 ),
                               ),
-                              context: context,
-                              builder: (context) => Container(
-                                    height: 250,
-                                    child: Container(
-                                        decoration: BoxDecoration(
-                                            color: wrongBottomSheetBg,
-                                            borderRadius:
-                                                const BorderRadius.only(
-                                                    topLeft:
-                                                        Radius.circular(20.0),
-                                                    topRight:
-                                                        Radius.circular(20.0))),
-                                        child: Center(
-                                          child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: <Widget>[
-                                              const Padding(
-                                                  padding: EdgeInsets.all(10)),
-                                              const Text(
-                                                'Wrong Answer',
-                                                style: TextStyle(
-                                                  fontSize: 24,
-                                                  color: Colors.red,
-                                                  fontWeight: FontWeight.bold,
+                              builder: (BuildContext context) {
+                                return SizedBox(
+                                  height: 300,
+                                  child: Center(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: <Widget>[
+                                        const Padding(
+                                            padding: EdgeInsets.all(10)),
+                                        Image.asset(
+                                          'assets/images/artwork_fawanees.png',
+                                          width: 65,
+                                          height: 65,
+                                        ),
+                                        const Padding(
+                                            padding: EdgeInsets.all(10)),
+                                        const Text(
+                                          'Correct Answer',
+                                          style: TextStyle(
+                                            fontSize: 24,
+                                            color: Colors.greenAccent,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        const Padding(
+                                            padding: EdgeInsets.all(2)),
+                                        const Text(
+                                          'New Fanows had been added \nfor you',
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            fontSize: 17,
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.normal,
+                                          ),
+                                        ),
+                                        const Padding(
+                                            padding: EdgeInsets.all(2)),
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 2, horizontal: 7),
+                                          child: Center(
+                                            child: ConstrainedBox(
+                                              constraints: const BoxConstraints(
+                                                  minWidth: double.infinity,
+                                                  minHeight: 34),
+                                              child: OutlinedButton(
+                                                style: ElevatedButton.styleFrom(
+                                                  foregroundColor: Colors.white,
+                                                  side: const BorderSide(
+                                                      width: 1.0),
+                                                  //change background color of button
+                                                  //change text color of button
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            5),
+                                                  ),
                                                 ),
-                                              ),
-                                              const Padding(
-                                                  padding: EdgeInsets.all(10)),
-                                              const Text(
-                                                'We hope you get a correct answer \nnext time.',
-                                                textAlign: TextAlign.center,
-                                                style: TextStyle(
-                                                  fontSize: 17,
-                                                  color: Colors.white,
-                                                  fontWeight: FontWeight.normal,
+                                                child: const Text(
+                                                  'REDEEM FAWANEES',
+                                                  style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
                                                 ),
+                                                onPressed: () =>
+                                                    Navigator.pop(context),
                                               ),
-                                              const Padding(
-                                                  padding: EdgeInsets.all(10)),
-                                              Padding(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        vertical: 2,
-                                                        horizontal: 7),
-                                                child: Center(
-                                                  child: ConstrainedBox(
-                                                    constraints:
-                                                        const BoxConstraints(
-                                                            minWidth:
-                                                                double.infinity,
-                                                            minHeight: 34),
-                                                    child: OutlinedButton(
-                                                      style: ElevatedButton
-                                                          .styleFrom(
-                                                        foregroundColor:
-                                                            Colors.white,
-                                                        side: const BorderSide(
+                                            ),
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 2, horizontal: 10),
+                                          child: Center(
+                                            child: ConstrainedBox(
+                                              constraints: const BoxConstraints(
+                                                  minWidth: double.infinity,
+                                                  minHeight: 34),
+                                              child: ElevatedButton(
+                                                style: ElevatedButton.styleFrom(
+                                                  foregroundColor: Colors.white,
+                                                  backgroundColor:
+                                                      selectedColorOrange,
+                                                  //change background color of button
+                                                  //change text color of button
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            5),
+                                                  ),
+                                                ),
+                                                child: const Text(
+                                                  'Done',
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                                onPressed: () =>
+                                                    Navigator.pop(context),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+                          });
+                        } else {
+                          setState(() {
+                            isCorrect = false;
+                            showBottomSheet(
+                                shape: const RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.vertical(
+                                    top: Radius.circular(20),
+                                  ),
+                                ),
+                                context: context,
+                                builder: (context) => Container(
+                                      height: 250,
+                                      child: Container(
+                                          decoration: BoxDecoration(
+                                              color: wrongBottomSheetBg,
+                                              borderRadius:
+                                                  const BorderRadius.only(
+                                                      topLeft:
+                                                          Radius.circular(20.0),
+                                                      topRight: Radius.circular(
+                                                          20.0))),
+                                          child: Center(
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: <Widget>[
+                                                const Padding(
+                                                    padding:
+                                                        EdgeInsets.all(10)),
+                                                const Text(
+                                                  'Wrong Answer',
+                                                  style: TextStyle(
+                                                    fontSize: 24,
+                                                    color: Colors.red,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                                const Padding(
+                                                    padding:
+                                                        EdgeInsets.all(10)),
+                                                const Text(
+                                                  'We hope you get a correct answer \nnext time.',
+                                                  textAlign: TextAlign.center,
+                                                  style: TextStyle(
+                                                    fontSize: 17,
+                                                    color: Colors.white,
+                                                    fontWeight:
+                                                        FontWeight.normal,
+                                                  ),
+                                                ),
+                                                const Padding(
+                                                    padding:
+                                                        EdgeInsets.all(10)),
+                                                Padding(
+                                                  padding: const EdgeInsets
+                                                          .symmetric(
+                                                      vertical: 2,
+                                                      horizontal: 7),
+                                                  child: Center(
+                                                    child: ConstrainedBox(
+                                                      constraints:
+                                                          const BoxConstraints(
+                                                              minWidth: double
+                                                                  .infinity,
+                                                              minHeight: 34),
+                                                      child: OutlinedButton(
+                                                        style: ElevatedButton
+                                                            .styleFrom(
+                                                          foregroundColor:
+                                                              Colors.white,
+                                                          side:
+                                                              const BorderSide(
+                                                                  color: Colors
+                                                                      .white,
+                                                                  width: 1.0),
+                                                          //change background color of button
+                                                          //change text color of button
+                                                          shape:
+                                                              RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        5),
+                                                          ),
+                                                        ),
+                                                        child: const Text(
+                                                          'DONE',
+                                                          style: TextStyle(
                                                             color: Colors.white,
-                                                            width: 1.0),
-                                                        //change background color of button
-                                                        //change text color of button
-                                                        shape:
-                                                            RoundedRectangleBorder(
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(5),
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                          ),
                                                         ),
+                                                        onPressed: () =>
+                                                            Navigator.pop(
+                                                                context),
                                                       ),
-                                                      child: const Text(
-                                                        'DONE',
-                                                        style: TextStyle(
-                                                          color: Colors.white,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                        ),
-                                                      ),
-                                                      onPressed: () =>
-                                                          Navigator.pop(
-                                                              context),
                                                     ),
                                                   ),
                                                 ),
-                                              ),
-                                            ],
-                                          ),
-                                        )),
-                                  ));
-                        });
+                                              ],
+                                            ),
+                                          )),
+                                    ));
+                          });
+                        }
                       }
-                    }
-                  },
-                  child: const Text('Confirm'),
+                    },
+                    child: const Text('Confirm'),
+                  ),
                 ),
               ),
             ),
