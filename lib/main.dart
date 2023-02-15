@@ -70,20 +70,24 @@ class _HomeWidgetState extends State<QuestionWidget> {
             ),
             elevation: 0,
           ),
-          body: Container(
-            decoration: const BoxDecoration(
-                color: Colors.white,
-                image: DecorationImage(
-                    fit: BoxFit.fill,
-                    image: AssetImage('assets/images/bg_athkar.png'))),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                TileWidget(numberOfDay: 2),
-                const SizedBox(height: 32),
-                Expanded(child: ListViewStateFull(setElevatedButton)),
-              ],
-            ),
+          body: Stack(
+            children: [
+              Container(
+                decoration: const BoxDecoration(
+                    color: Colors.white,
+                    image: DecorationImage(
+                        fit: BoxFit.fill,
+                        image: AssetImage('assets/images/bg_athkar.png'))),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    TileWidget(numberOfDay: 2),
+                    const SizedBox(height: 32),
+                    Expanded(child: ListViewStateFull(setElevatedButton)),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -151,31 +155,36 @@ class ListViewStateFull extends StatefulWidget {
   ListViewHome createState() => ListViewHome();
 }
 
+enum Answer {
+  none,
+  checked,
+  correct,
+  wrong,
+}
+
 class ListViewHome extends State<ListViewStateFull> {
   @override
   void initState() {
     super.initState();
   }
 
+  Answer answer = Answer.none;
+
   int _selectedIndex = -1;
-  bool? isCorrect = null;
-  static bool preSelected = false;
+
   static bool isScreenBlocked = false;
 
   Color selectedColor = const Color(0xFFB7B7B7);
-  Color selectedColorCorrectBgGreen = const Color(0xFFFFFFFF);
-  Color selectedColorCorrectBgWhite = const Color(0xFF55DD53);
+  Color selectedColorCorrectBgWhite = const Color(0xFFFFFFFF);
+  Color selectedColorCorrectBgGreen = const Color(0xFF55DD53);
   Color wrongBottomSheetBg = const Color(0xFF333333);
-
-  Color selectedColorCorrectText =
-      preSelected ? const Color(0xFF55DD53) : const Color(0xFFFFFFFF);
 
   Color selectedColorOrange = const Color(0xFFF16E01);
   Color selectedColorRed = const Color(0xFFF03434);
   Color unSelectedColor = const Color(0xFFFFFFFF);
 
   _onSelected(int index) {
-    setState(() => _selectedIndex = index);
+    setState(() => {_selectedIndex = index, answer = Answer.checked});
     widget.setElevatedButton();
   }
 
@@ -211,63 +220,44 @@ class ListViewHome extends State<ListViewStateFull> {
                             ],
                             border: Border.all(
                                 color: _selectedIndex != null &&
-                                        _selectedIndex == index &&
-                                        isCorrect != null &&
-                                        preSelected
-                                    ? selectedColorCorrectBgWhite
-                                    : selectedColorCorrectBgGreen),
+                                        _selectedIndex == index
+                                    ? (answer == Answer.none
+                                        ? selectedColorOrange
+                                        : answer == Answer.correct
+                                            ? selectedColorCorrectBgGreen
+                                            : selectedColorRed)
+                                    : selectedColorCorrectBgWhite),
                             borderRadius: BorderRadius.circular(10),
-                            color: _selectedIndex != null &&
-                                    _selectedIndex == index &&
-                                    isCorrect != null &&
-                                    isCorrect!
-                                ? preSelected
-                                    ? selectedColorCorrectBgGreen
-                                    : selectedColorCorrectBgWhite
-                                : _selectedIndex != null &&
-                                        _selectedIndex == index &&
-                                        isCorrect == null
-                                    ? unSelectedColor
-                                    : _selectedIndex != null &&
-                                            _selectedIndex == index &&
-                                            isCorrect != null &&
-                                            !isCorrect!
-                                        ? selectedColorRed
-                                        : unSelectedColor),
+                            color: unSelectedColor),
                         child: ListTile(
                           leading: ConstrainedBox(
-                            constraints: const BoxConstraints(
-                              minWidth: 24,
-                              minHeight: 24,
-                              maxWidth: 24,
-                              maxHeight: 24,
-                            ),
-                            child: _selectedIndex != null &&
-                                    _selectedIndex == index &&
-                                    isCorrect != null &&
-                                    isCorrect!
-                                ? preSelected
-                                    ? SvgPicture.asset(
-                                        'assets/images/icon_correct_green.svg')
-                                    : SvgPicture.asset(
-                                        'assets/images/icon_correct.svg')
-                                : _selectedIndex != null &&
-                                        _selectedIndex == index &&
-                                        isCorrect != null &&
-                                        !isCorrect!
-                                    ? Image.asset('assets/images/wrong.png',
-                                        fit: BoxFit.fill)
-                                    :RadioListTile<SingingCharacter>(
-                              title: const Text('Thomas Jefferson'),
-                              value: SingingCharacter.jefferson,
-                              groupValue: _character,
-                              onChanged: (SingingCharacter? value) {
-                                setState(() {
-                                  _character = value;
-                                });
-                              },
-                            ),
-                          ),
+                              constraints: const BoxConstraints(
+                                minWidth: 24,
+                                minHeight: 24,
+                                maxWidth: 24,
+                                maxHeight: 24,
+                              ),
+                              child: _selectedIndex != null &&
+                                      _selectedIndex == index &&
+                                      answer != Answer.none &&
+                                      answer == Answer.correct
+                                  ? SvgPicture.asset(
+                                      'assets/images/icon_correct.svg')
+                                  : _selectedIndex != null &&
+                                          _selectedIndex == index &&
+                                          answer == Answer.correct
+                                      ? SvgPicture.asset(
+                                          'assets/images/icon_correct.svg')
+                                      : _selectedIndex == index &&
+                                              answer == Answer.wrong
+                                          ? SvgPicture.asset(
+                                              'assets/images/icon_wrong.svg')
+                                          : _selectedIndex == index &&
+                                                  answer == Answer.checked
+                                              ? SvgPicture.asset(
+                                                  'assets/images/radio_checked.svg')
+                                              : SvgPicture.asset(
+                                                  'assets/images/radio_unchecked.svg')),
                           // No matter how big it is, it won't overflow
                           title: Align(
                             alignment: const Alignment(-1.2, -0.2),
@@ -275,13 +265,23 @@ class ListViewHome extends State<ListViewStateFull> {
                               questions.options[index].text,
                               style: TextStyle(
                                 fontSize: 17,
-                                color: _selectedIndex != null &&
-                                        _selectedIndex == index &&
-                                        isCorrect != null
-                                    ? preSelected
-                                        ? selectedColorCorrectBgWhite
-                                        : selectedColorCorrectBgGreen
-                                    : Colors.black,
+                                color: answer == Answer.correct &&
+                                        _selectedIndex == index
+                                    ? selectedColorCorrectBgGreen
+                                    : answer == Answer.correct &&
+                                            _selectedIndex == index &&
+                                            answer == Answer.correct
+                                        ? selectedColorCorrectBgGreen
+                                        : answer == Answer.checked &&
+                                                _selectedIndex == index
+                                            ? selectedColorOrange
+                                            : answer == Answer.correct &&
+                                                    _selectedIndex == index
+                                                ? selectedColorCorrectBgGreen
+                                                : answer == Answer.wrong &&
+                                                        _selectedIndex == index
+                                                    ? selectedColorRed
+                                                    : Colors.black,
                                 fontWeight: FontWeight.normal,
                               ),
                             ),
@@ -322,16 +322,9 @@ class ListViewHome extends State<ListViewStateFull> {
                         if (questions.options[_selectedIndex].isCorrect) {
                           setState(() {
                             isScreenBlocked = true;
-                            isCorrect = true;
-                            preSelected = true;
+                            answer = Answer.correct;
                           });
                           Timer(const Duration(seconds: 2), () {
-                            setState(() {
-                              preSelected = false;
-                            });
-                          });
-
-                          Timer(const Duration(seconds: 3), () {
                             showModalBottomSheet<void>(
                               context: context,
                               enableDrag: true,
@@ -448,6 +441,8 @@ class ListViewHome extends State<ListViewStateFull> {
                                             ),
                                           ),
                                         ),
+                                        const Padding(
+                                            padding: EdgeInsets.all(7)),
                                       ],
                                     ),
                                   ),
@@ -457,7 +452,7 @@ class ListViewHome extends State<ListViewStateFull> {
                           });
                         } else {
                           setState(() {
-                            isCorrect = false;
+                            answer = Answer.wrong;
                             showBottomSheet(
                                 shape: const RoundedRectangleBorder(
                                   borderRadius: BorderRadius.vertical(
@@ -556,6 +551,8 @@ class ListViewHome extends State<ListViewStateFull> {
                                                     ),
                                                   ),
                                                 ),
+                                                const Padding(
+                                                    padding: EdgeInsets.all(7)),
                                               ],
                                             ),
                                           )),
@@ -668,5 +665,58 @@ class _SlideFadeTransitionState extends State<SlideFadeTransition>
             ),
           )
         : widget.child;
+  }
+}
+
+class ShapeTransitionWidget extends StatefulWidget {
+  const ShapeTransitionWidget({super.key});
+
+  @override
+  State<ShapeTransitionWidget> createState() => _ShapeTransitionState();
+}
+
+class _ShapeTransitionState extends State<ShapeTransitionWidget>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+
+  late Animation<double> _animationFade;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: Duration(seconds: 2),
+    )..forward();
+
+    _animationFade = Tween<double>(begin: 0, end: 1.0).animate(CurvedAnimation(
+      curve: Curves.linear,
+      parent: _animationController,
+    ));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
+    double width = size.width;
+    double height = size.height;
+    double maxSide = size.longestSide;
+    return Stack(
+      children: [
+        AnimatedBuilder(animation: _animationFade, builder: (context, widget) => Positioned(
+            top: 1000   ,
+            child: Transform.scale(
+              scale: _animationFade.value,
+              child: Container(
+                width: maxSide,
+                height: maxSide,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(maxSide),
+                  color: Colors.red,
+                ),
+              ),
+            )))
+      ],
+    );
   }
 }
