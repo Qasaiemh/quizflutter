@@ -32,6 +32,9 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
+  intl:
+  intl_translation:
+
   scoped_model: "^2.0.0"
   sqflite: ^2.2.4
   path_provider: ^2.0.11
@@ -48,6 +51,9 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
+  flutter_localizations:
+      sdk: flutter
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -69,6 +75,8 @@ flutter:
   assets:
     #    - .env
     - assets/images/
+    - assets/lang/
+
 
   # To add assets to your application, add an assets section, like this:
   # assets:

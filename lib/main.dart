@@ -1,13 +1,16 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:untitled/model.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 
-void main() {
-  runApp(const MyApp());
-}
+import 'ScopeModelWrapper.dart';
+import 'Translations.dart';
+import 'TranslationsDelegate.dart';
+
+void main() => runApp(new ScopeModelWrapper());
 
 bool firstRun = true;
 
@@ -37,6 +40,59 @@ class MyApp extends StatelessWidget {
   }
 }
 
+class _MyHomePageState extends State<QuestionWidget>
+    with TickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController =
+        AnimationController(vsync: this, duration: const Duration(seconds: 10))
+          ..forward();
+    _animation = Tween(begin: 0.0, end: 1.0).animate(
+        CurvedAnimation(parent: _animationController, curve: Curves.linear));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
+    double height = size.height;
+    double width = size.width;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text(''),
+      ),
+      body: Stack(
+        alignment: Alignment.topCenter,
+        children: [
+          SizedBox(width: size.width, height: size.height),
+          Image.asset(
+            'assets/images/animated_tile.png',
+            width: width,
+          ),
+          AnimatedBuilder(
+              animation: _animation,
+              builder: (context, widget) {
+                return Transform.translate(
+                    offset: Offset(0, -_animation.value * height / 3),
+                    child: Transform.scale(
+                      scaleY: .5 - _animation.value,
+                      scaleX: 2,
+                      child: Image.asset(
+                        'assets/images/animated_bg.png',
+                        height: height,
+                      ),
+                    ));
+              })
+        ],
+      ),
+    );
+  }
+}
+
 class QuestionWidget extends StatefulWidget {
   const QuestionWidget({
     Key? key,
@@ -54,45 +110,41 @@ class _HomeWidgetState extends State<QuestionWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Container(
-        child: Scaffold(
-          appBar: AppBar(
-            backgroundColor: Colors.white,
-            leading: IconButton(
-              icon: Icon(Icons.arrow_back, color: Colors.black),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-            title: const Text(
-              "Fawanees Challenge",
-              style:
-                  TextStyle(color: Colors.black, fontWeight: FontWeight.w700),
-            ),
-            elevation: 0,
+    return Container(
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back, color: Colors.black),
+            onPressed: () => Navigator.of(context).pop(),
           ),
-          body: Stack(
-            children: [
-              Container(
-                decoration: const BoxDecoration(
-                    color: Colors.white,
-                    image: DecorationImage(
-                        fit: BoxFit.fill,
-                        image: AssetImage('assets/images/bg_athkar.png'))),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    TileWidget(numberOfDay: 2),
-                    const SizedBox(height: 32),
-                    Expanded(child: ListViewStateFull(setElevatedButton)),
-                  ],
-                ),
+          title: Text(
+            Translations.of(context)!.title,
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.w700),
+          ),
+          elevation: 0,
+        ),
+        body: Stack(
+          children: [
+            Container(
+              decoration: const BoxDecoration(
+                  color: Colors.white,
+                  image: DecorationImage(
+                      fit: BoxFit.fill,
+                      image: AssetImage('assets/images/bg_athkar.png'))),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  TileWidget(numberOfDay: 2),
+                  const SizedBox(height: 32),
+                  Expanded(child: ListViewStateFull(setElevatedButton)),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
-    throw UnimplementedError();
   }
 
   void setElevatedButton() {
@@ -116,32 +168,35 @@ class TileWidget extends StatelessWidget {
             width: 100,
             height: 100,
           ),
-          Column(crossAxisAlignment: CrossAxisAlignment.start, children: const [
+          Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             SlideFadeTransition(
                 delayStart: Duration(milliseconds: 200),
                 offset: 2,
                 direction: Direction.horizontal,
                 child: Text(
-                  "Day 1",
-                  style: TextStyle(
+                  Translations.of(context)!.numberOfRamadanDay,
+                  style: const TextStyle(
                       color: Colors.black,
                       fontWeight: FontWeight.bold,
                       fontSize: 19),
                 )),
-            Padding(
+            const Padding(
               padding: EdgeInsets.all(10), //apply padding to all four sides
             ),
             SlideFadeTransition(
                 delayStart: Duration(milliseconds: 200),
                 offset: 2,
                 direction: Direction.horizontal,
-                child: Text(
-                  "is simply dummy text of the \nprinting and typesetting industry ?",
-                  style: TextStyle(
+                child: Expanded(
+                    child: Container(
+                        child: Text(
+                  Translations.of(context)!.fawaneesDescription,
+                  textAlign: TextAlign.justify,
+                  style: const TextStyle(
                       color: Colors.black,
                       fontWeight: FontWeight.normal,
                       fontSize: 17),
-                )),
+                ))))
           ]),
         ]));
   }
@@ -182,6 +237,7 @@ class ListViewHome extends State<ListViewStateFull> {
   Color selectedColorOrange = const Color(0xFFF16E01);
   Color selectedColorRed = const Color(0xFFF03434);
   Color unSelectedColor = const Color(0xFFFFFFFF);
+  Color unSelectedColor2 = const Color(0xFF9E9E9E);
 
   _onSelected(int index) {
     setState(() => {_selectedIndex = index, answer = Answer.checked});
@@ -259,33 +315,31 @@ class ListViewHome extends State<ListViewStateFull> {
                                               : SvgPicture.asset(
                                                   'assets/images/radio_unchecked.svg')),
                           // No matter how big it is, it won't overflow
-                          title: Align(
-                            alignment: const Alignment(-1.2, -0.2),
-                            child: Text(
-                              questions.options[index].text,
-                              style: TextStyle(
-                                fontSize: 17,
-                                color: answer == Answer.correct &&
-                                        _selectedIndex == index
-                                    ? selectedColorCorrectBgGreen
-                                    : answer == Answer.correct &&
-                                            _selectedIndex == index &&
-                                            answer == Answer.correct
-                                        ? selectedColorCorrectBgGreen
-                                        : answer == Answer.checked &&
-                                                _selectedIndex == index
-                                            ? selectedColorOrange
-                                            : answer == Answer.correct &&
-                                                    _selectedIndex == index
-                                                ? selectedColorCorrectBgGreen
-                                                : answer == Answer.wrong &&
-                                                        _selectedIndex == index
-                                                    ? selectedColorRed
-                                                    : Colors.black,
-                                fontWeight: FontWeight.normal,
-                              ),
+                          title: Text(
+                            questions.options[index].text,
+                            style: TextStyle(
+                              fontSize: 17,
+                              color: answer == Answer.correct &&
+                                      _selectedIndex == index
+                                  ? selectedColorCorrectBgGreen
+                                  : answer == Answer.correct &&
+                                          _selectedIndex == index &&
+                                          answer == Answer.correct
+                                      ? selectedColorCorrectBgGreen
+                                      : answer == Answer.checked &&
+                                              _selectedIndex == index
+                                          ? selectedColorOrange
+                                          : answer == Answer.correct &&
+                                                  _selectedIndex == index
+                                              ? selectedColorCorrectBgGreen
+                                              : answer == Answer.wrong &&
+                                                      _selectedIndex == index
+                                                  ? selectedColorRed
+                                                  : Colors.black,
+                              fontWeight: FontWeight.normal,
                             ),
                           ),
+
                           onTap: () => _onSelected(index),
                         ),
                       ),
@@ -305,12 +359,14 @@ class ListViewHome extends State<ListViewStateFull> {
                       minWidth: double.infinity, minHeight: 34),
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.white,
+                      foregroundColor: answer == Answer.checked
+                          ? Colors.white
+                          : Color(0xFFBABABA),
                       //change background color of button
                       backgroundColor:
                           (_selectedIndex != null && _selectedIndex != -1)
                               ? selectedColorOrange
-                              : unSelectedColor,
+                              : unSelectedColor2,
                       //change text color of button
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(5),
@@ -324,7 +380,7 @@ class ListViewHome extends State<ListViewStateFull> {
                             isScreenBlocked = true;
                             answer = Answer.correct;
                           });
-                          Timer(const Duration(seconds: 2), () {
+                          Timer(const Duration(milliseconds: 500), () {
                             showModalBottomSheet<void>(
                               context: context,
                               enableDrag: true,
@@ -561,7 +617,7 @@ class ListViewHome extends State<ListViewStateFull> {
                         }
                       }
                     },
-                    child: const Text('Confirm'),
+                    child: Text(Translations.of(context)!.confirm),
                   ),
                 ),
               ),
@@ -703,19 +759,21 @@ class _ShapeTransitionState extends State<ShapeTransitionWidget>
     double maxSide = size.longestSide;
     return Stack(
       children: [
-        AnimatedBuilder(animation: _animationFade, builder: (context, widget) => Positioned(
-            top: 1000   ,
-            child: Transform.scale(
-              scale: _animationFade.value,
-              child: Container(
-                width: maxSide,
-                height: maxSide,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(maxSide),
-                  color: Colors.red,
-                ),
-              ),
-            )))
+        AnimatedBuilder(
+            animation: _animationFade,
+            builder: (context, widget) => Positioned(
+                top: 1000,
+                child: Transform.scale(
+                  scale: _animationFade.value,
+                  child: Container(
+                    width: maxSide,
+                    height: maxSide,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(maxSide),
+                      color: Colors.red,
+                    ),
+                  ),
+                )))
       ],
     );
   }

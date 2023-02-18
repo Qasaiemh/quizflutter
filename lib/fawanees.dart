@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:untitled/FawaneesModel.dart';
@@ -242,8 +241,10 @@ class FawaneesState extends StatefulWidget {
 
 class FawaneesListview extends State<FawaneesState> {
   Color textColorOrange = const Color(0xFFDD9B59);
+  Color buttonColorOrange = const Color(0xFFF16E01);
+  Color textColorDisabled = const Color(0xFFC4C4C4);
 
-  final List<Fawanees> entries = <Fawanees>[
+  final List<Fawanees> fawaneesDynmicList = <Fawanees>[
     Fawanees(
         totalFanwos: "5",
         numberOfFanwos: "5",
@@ -277,13 +278,35 @@ class FawaneesListview extends State<FawaneesState> {
         isLocked: true,
         isAdded: false)
   ];
+  final List<Fawanees> fawaneesStaticList = <Fawanees>[
+    Fawanees(
+        totalFanwos: "5",
+        numberOfFanwos: "200",
+        data: "1",
+        dataUnit: "Chance",
+        validty: "to win on the draw",
+        isLocked: false,
+        isAdded: true),
+    Fawanees(
+        totalFanwos: "30",
+        numberOfFanwos: "201-250",
+        data: "5",
+        dataUnit: "Chances",
+        validty: "to win on the draw",
+        isLocked: false,
+        isAdded: false),
+    Fawanees(
+        totalFanwos: "30",
+        numberOfFanwos: ">250",
+        data: "10",
+        dataUnit: "Chances",
+        validty: "to win on the draw",
+        isLocked: false,
+        isAdded: false)
+  ];
 
   @override
   Widget build(BuildContext context) {
-    // count of the list of image
-    var ImgCount = entries.length;
-
-    // MaterialApp with debugShowCheckedModeBanner false
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
@@ -297,7 +320,7 @@ class FawaneesListview extends State<FawaneesState> {
                 scrollDirection: Axis.vertical,
                 children: [
                   // showing list of images
-                  for (var item in entries)
+                  for (var item in fawaneesDynmicList)
                     Center(
                         child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -315,8 +338,10 @@ class FawaneesListview extends State<FawaneesState> {
                                 Column(children: [
                                   Text(
                                     item.numberOfFanwos,
-                                    style: const TextStyle(
-                                        color: Colors.black,
+                                    style: TextStyle(
+                                        color: item.isLocked
+                                            ? textColorDisabled
+                                            : Colors.black,
                                         fontWeight: FontWeight.bold,
                                         fontSize: 25),
                                   ),
@@ -324,10 +349,12 @@ class FawaneesListview extends State<FawaneesState> {
                                     padding: EdgeInsets.all(
                                         5), //apply padding to all four sides
                                   ),
-                                  const Text(
+                                  Text(
                                     "Fawanees",
                                     style: TextStyle(
-                                        color: Colors.black,
+                                        color: item.isLocked
+                                            ? textColorDisabled
+                                            : Colors.black,
                                         fontWeight: FontWeight.normal,
                                         fontSize: 17),
                                   )
@@ -347,9 +374,11 @@ class FawaneesListview extends State<FawaneesState> {
                                         child: Text(
                                           item.data,
                                           style: TextStyle(
-                                              color: item.isAdded
-                                                  ? Colors.black
-                                                  : textColorOrange,
+                                              color: item.isLocked
+                                                  ? textColorDisabled
+                                                  : item.isAdded
+                                                      ? Colors.black
+                                                      : textColorOrange,
                                               fontWeight: FontWeight.bold,
                                               fontSize: 22),
                                         ),
@@ -362,9 +391,11 @@ class FawaneesListview extends State<FawaneesState> {
                                     Text(
                                       item.dataUnit,
                                       style: TextStyle(
-                                          color: item.isAdded
-                                              ? Colors.black
-                                              : textColorOrange,
+                                          color: item.isLocked
+                                              ? textColorDisabled
+                                              : item.isAdded
+                                                  ? Colors.black
+                                                  : textColorOrange,
                                           fontWeight: FontWeight.normal,
                                           fontSize: 17),
                                     ),
@@ -382,8 +413,10 @@ class FawaneesListview extends State<FawaneesState> {
                                   ),
                                   Text(
                                     item.validty,
-                                    style: const TextStyle(
-                                        color: Colors.black,
+                                    style:  TextStyle(
+                                        color: item.isLocked
+                                            ? textColorDisabled
+                                            : Colors.black,
                                         fontWeight: FontWeight.normal,
                                         fontSize: 15),
                                   ),
@@ -400,15 +433,15 @@ class FawaneesListview extends State<FawaneesState> {
                                 ),
                                 GestureDetector(
                                     onTap: () {},
-                                    child: item.isAdded
-                                        ? Text("Added",
-                                            style: TextStyle(
-                                                fontSize: 17,
-                                                color: Colors.black))
-                                        : Text("Get",
-                                            style: TextStyle(
-                                                fontSize: 17,
-                                                color: textColorOrange)))
+                                    child: Text(item.isAdded ? "Added" : "Get",
+                                        style: TextStyle(
+                                          fontSize: 17,
+                                          color: item.isLocked
+                                              ? textColorDisabled
+                                              : item.isAdded
+                                                  ? Colors.black
+                                                  : textColorOrange,
+                                        )))
                               ]),
                             ],
                           ),
@@ -453,13 +486,16 @@ class FawaneesListview extends State<FawaneesState> {
                       ]),
                   Expanded(
                     child: Container(
-                      child: Text(
-                        "Get the chance to win daily prizes, as well as \nsmartphones, smartwatches, and cash money, in the \ndraw that will take place on 01.05.2023",
-                        style: TextStyle(
-                            color: textColorOrange,
-                            fontWeight: FontWeight.normal,
-                            fontSize: 14),
-                      ),
+                      margin: EdgeInsets.only(right: 15, bottom: 10, left: 5),
+                      //You can use EdgeInsets like above
+                      child: const Text(
+                          'Get the chance to win daily prizes, as '
+                          'well as smartphones, smartwatches, and cash money, in the '
+                          'draw that will take place on 01.05.2023',
+                          textAlign: TextAlign.justify,
+                          style: TextStyle(
+                            fontSize: 14,
+                          )),
                     ),
                   ),
                 ],
@@ -470,7 +506,7 @@ class FawaneesListview extends State<FawaneesState> {
                 scrollDirection: Axis.vertical,
                 children: [
                   // showing list of images
-                  for (var item in entries)
+                  for (var item in fawaneesStaticList)
                     Center(
                         child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -488,8 +524,8 @@ class FawaneesListview extends State<FawaneesState> {
                                 Column(children: [
                                   Text(
                                     item.numberOfFanwos,
-                                    style: const TextStyle(
-                                        color: Colors.black,
+                                    style: TextStyle(
+                                        color: textColorDisabled,
                                         fontWeight: FontWeight.bold,
                                         fontSize: 25),
                                   ),
@@ -497,10 +533,10 @@ class FawaneesListview extends State<FawaneesState> {
                                     padding: EdgeInsets.all(
                                         5), //apply padding to all four sides
                                   ),
-                                  const Text(
+                                  Text(
                                     "Fawanees",
                                     style: TextStyle(
-                                        color: Colors.black,
+                                        color: textColorDisabled,
                                         fontWeight: FontWeight.normal,
                                         fontSize: 17),
                                   )
@@ -520,9 +556,7 @@ class FawaneesListview extends State<FawaneesState> {
                                         child: Text(
                                           item.data,
                                           style: TextStyle(
-                                              color: item.isAdded
-                                                  ? Colors.black
-                                                  : textColorOrange,
+                                              color: textColorDisabled,
                                               fontWeight: FontWeight.bold,
                                               fontSize: 22),
                                         ),
@@ -535,9 +569,7 @@ class FawaneesListview extends State<FawaneesState> {
                                     Text(
                                       item.dataUnit,
                                       style: TextStyle(
-                                          color: item.isAdded
-                                              ? Colors.black
-                                              : textColorOrange,
+                                          color: textColorDisabled,
                                           fontWeight: FontWeight.normal,
                                           fontSize: 17),
                                     ),
@@ -555,41 +587,43 @@ class FawaneesListview extends State<FawaneesState> {
                                   ),
                                   Text(
                                     item.validty,
-                                    style: const TextStyle(
-                                        color: Colors.black,
+                                    style: TextStyle(
+                                        color: textColorDisabled,
                                         fontWeight: FontWeight.normal,
                                         fontSize: 15),
                                   ),
                                 ]),
-                                const SizedBox(
-                                  width: 10,
-                                ),
-                                Container(
-                                    height: 50,
-                                    child: VerticalDivider(
-                                        color: Color(0xFFE0E0E0))),
-                                const SizedBox(
-                                  width: 40,
-                                ),
-                                GestureDetector(
-                                    onTap: () {},
-                                    child: item.isAdded
-                                        ? Text("Added",
-                                            style: TextStyle(
-                                                fontSize: 17,
-                                                color: Colors.black))
-                                        : Text("Get",
-                                            style: TextStyle(
-                                                fontSize: 17,
-                                                color: textColorOrange)))
                               ]),
                             ],
                           ),
                         ),
                       ],
-                    ))
+                    )),
                 ],
               ),
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(
+                        minWidth: double.infinity, minHeight: 34),
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        //change background color of button
+                        backgroundColor: buttonColorOrange,
+                        //change text color of button
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                      ),
+                      onPressed: () {},
+                      child: const Text('Done'),
+                    ),
+                  ),
+                ),
+              )
             ],
           ),
         ),
