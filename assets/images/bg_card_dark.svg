@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="341" height="109" viewBox="0 0 341 109">
+  <defs>
+    <filter id="Rectangle_9033" x="0" y="0" width="341" height="109" filterUnits="userSpaceOnUse">
+      <feOffset dy="5" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="3.5" result="blur"/>
+      <feFlood flood-opacity="0.078"/>
+      <feComposite operator="in" in2="blur"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="Rectangle_9712" x="14.5" y="9.5" width="312" height="80" filterUnits="userSpaceOnUse">
+      <feOffset dy="3" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="3" result="blur-2"/>
+      <feFlood flood-opacity="0.251" result="color"/>
+      <feComposite operator="out" in="SourceGraphic" in2="blur-2"/>
+      <feComposite operator="in" in="color"/>
+      <feComposite operator="in" in2="SourceGraphic"/>
+    </filter>
+  </defs>
+  <g id="wideroundedbox" transform="translate(-5.5 -365.5)">
+    <g transform="matrix(1, 0, 0, 1, 5.5, 365.5)" filter="url(#Rectangle_9033)">
+      <rect id="Rectangle_9033-2" data-name="Rectangle 9033" width="320" height="88" rx="30" transform="translate(10.5 5.5)" fill="#2f2f2f"/>
+    </g>
+    <g data-type="innerShadowGroup">
+      <g transform="matrix(1, 0, 0, 1, 5.5, 365.5)" filter="url(#Rectangle_9712)">
+        <rect id="Rectangle_9712-2" data-name="Rectangle 9712" width="312" height="80" rx="30" transform="translate(14.5 9.5)" fill="#fff"/>
+      </g>
+      <g id="Rectangle_9712-3" data-name="Rectangle 9712" transform="translate(20 375)" fill="none" stroke="#232323" stroke-width="1">
+        <rect width="312" height="80" rx="30" stroke="none"/>
+        <rect x="0.5" y="0.5" width="311" height="79" rx="29.5" fill="none"/>
+      </g>
+    </g>
+  </g>
+</svg>

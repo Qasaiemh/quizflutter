@@ -19,7 +19,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "numberOfRamadanDay" : MessageLookupByLibrary.simpleMessage("Day"),
     "language" : MessageLookupByLibrary.simpleMessage("عربي"),
     "confirm" : MessageLookupByLibrary.simpleMessage("CONFIRM"),
-    "fawaneesDescription" : MessageLookupByLibrary.simpleMessage("is simply dummy text of the \nprinting and typesetting industry ?"),
+    "fawaneesDescription" : MessageLookupByLibrary.simpleMessage("is simply dummy text of the \nprinting and typesetting industry ssssssss?"),
 
   };
 }

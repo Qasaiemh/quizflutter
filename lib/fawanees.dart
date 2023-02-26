@@ -1,10 +1,11 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:untitled/FawaneesModel.dart';
 
-void main() {
-  runApp(const MyApp());
-}
+// void main() {
+//   runApp(const MyApp());
+// }
 
 final List<Fawanees> entries = <Fawanees>[
   Fawanees(
@@ -40,20 +41,6 @@ final List<Fawanees> entries = <Fawanees>[
       isLocked: true,
       isAdded: false)
 ];
-
-class MyApp1 extends StatelessWidget {
-  const MyApp1({super.key});
-
-  static const String _title = 'Flutter Code Sample';
-
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      title: _title,
-      home: MyStatelessWidget(),
-    );
-  }
-}
 
 class MyStatelessWidget extends StatelessWidget {
   const MyStatelessWidget({super.key});
@@ -131,21 +118,21 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: const Scaffold(body: QuestionWidget()),
+      home: const Scaffold(body: FawaneesWidget()),
     );
   }
 }
 
-class QuestionWidget extends StatefulWidget {
-  const QuestionWidget({
+class FawaneesWidget extends StatefulWidget {
+  const FawaneesWidget({
     Key? key,
   }) : super(key: key);
 
   @override
-  State<QuestionWidget> createState() => _HomeWidgetState();
+  State<FawaneesWidget> createState() => _HomeWidgetState();
 }
 
-class _HomeWidgetState extends State<QuestionWidget> {
+class _HomeWidgetState extends State<FawaneesWidget> {
   @override
   void initState() {
     super.initState();
@@ -156,76 +143,77 @@ class _HomeWidgetState extends State<QuestionWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Container(
-        child: Scaffold(
-          appBar: AppBar(
-            backgroundColor: Colors.transparent,
-            leading: IconButton(
-              icon: Icon(Icons.arrow_back, color: Colors.black),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-            elevation: 0,
+    bool isDarkMode =
+        MediaQuery.of(context).platformBrightness == Brightness.dark;
+
+    return Container(
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () => Navigator.of(context).pop(),
           ),
-          body: Stack(
-            children: [
-              Container(
-                decoration: const BoxDecoration(
-                    color: Colors.white,
-                    image: DecorationImage(
-                        fit: BoxFit.fill,
-                        image: AssetImage('assets/images/bg_athkar.png'))),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    const Padding(
-                      padding:
-                          EdgeInsets.all(5), //apply padding to all four sides
-                    ),
-                    Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          const Align(
-                            alignment: Alignment.center,
-                            child: Text(
-                              "My Fawanees:",
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 19),
-                            ),
+          elevation: 0,
+        ),
+        body: Stack(
+          children: [
+            isDarkMode
+                ? SvgPicture.asset(
+                    'assets/images/bg_fawanees_dark.svg',
+                    fit: BoxFit.cover,
+                  )
+                : Image.asset(
+                    'assets/images/bg_athkar.png',
+                    fit: BoxFit.cover,
+                  ),
+            Container(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const Padding(
+                    padding:
+                        EdgeInsets.all(5), //apply padding to all four sides
+                  ),
+                  Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Align(
+                          alignment: Alignment.center,
+                          child: Text(
+                            "My Fawanees:",
+                            style: Theme.of(context).textTheme.titleMedium,
                           ),
-                          const Padding(
-                            padding: EdgeInsets.all(
-                                2), //apply padding to all four sides
-                          ),
-                          Text(
-                            '$numberOfFanwos',
-                            style: TextStyle(
-                                color: textColorOrange,
-                                fontWeight: FontWeight.normal,
-                                fontSize: 17),
-                          ),
-                          const Padding(
-                            padding: EdgeInsets.all(
-                                2), //apply padding to all four sides
-                          ),
-                          Image.asset(
-                            'assets/images/artwork_fawanees.png',
-                            width: 25,
-                            height: 40,
-                          ),
-                        ]),
-                    Flexible(
-                      child: FawaneesState(),
-                    ),
-                  ],
-                ),
+                        ),
+                        const Padding(
+                          padding: EdgeInsets.all(
+                              2), //apply padding to all four sides
+                        ),
+                        Text(
+                          '$numberOfFanwos',
+                          style: TextStyle(
+                              color: textColorOrange,
+                              fontWeight: FontWeight.normal,
+                              fontSize: 17),
+                        ),
+                        const Padding(
+                          padding: EdgeInsets.all(
+                              2), //apply padding to all four sides
+                        ),
+                        Image.asset(
+                          'assets/images/artwork_fawanees.png',
+                          width: 25,
+                          height: 40,
+                        ),
+                      ]),
+                  Flexible(
+                    child: FawaneesState(),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -240,10 +228,6 @@ class FawaneesState extends StatefulWidget {
 }
 
 class FawaneesListview extends State<FawaneesState> {
-  Color textColorOrange = const Color(0xFFDD9B59);
-  Color buttonColorOrange = const Color(0xFFF16E01);
-  Color textColorDisabled = const Color(0xFFC4C4C4);
-
   final List<Fawanees> fawaneesDynmicList = <Fawanees>[
     Fawanees(
         totalFanwos: "5",
@@ -307,32 +291,39 @@ class FawaneesListview extends State<FawaneesState> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        backgroundColor: Colors.transparent,
-        body: SingleChildScrollView(
-          child: Column(
-            children: [
-              ListView(
-                shrinkWrap: true,
-                primary: false,
-                scrollDirection: Axis.vertical,
-                children: [
-                  // showing list of images
-                  for (var item in fawaneesDynmicList)
-                    Center(
-                        child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Container(
-                          child: Stack(
-                            children: [
-                              FittedBox(fit: BoxFit.fitWidth),
-                              Image.asset('assets/images/card_bg_fawanees.png'),
-                              Row(children: [
-                                const SizedBox(
-                                  width: 40,
+    double width = MediaQuery.of(context).size.width;
+    bool isDarkMode =
+        MediaQuery.of(context).platformBrightness == Brightness.dark;
+    Color textColorOrange = const Color(0xFFDD9B59);
+    Color buttonColorOrange = const Color(0xFFF16E01);
+    Color textColorDisabled =
+        isDarkMode ? Color(0xFF7C7C7C) : Color(0xFFC4C4C4);
+
+    return Scaffold(
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            ListView(
+              shrinkWrap: true,
+              primary: false,
+              scrollDirection: Axis.vertical,
+              children: [
+                // showing list of images
+                for (var item in fawaneesDynmicList)
+                  Center(
+                      child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                        child: Stack(
+                          children: [
+                            isDarkMode
+                                ? Image.asset('assets/images/bg_card_dark.png')
+                                : Image.asset('assets/images/bg_card.png'),
+                            Container(
+                              child: Row(children: [
+                                SizedBox(
+                                  width: width *0.10,
                                   height: 120,
                                 ),
                                 Column(children: [
@@ -341,7 +332,9 @@ class FawaneesListview extends State<FawaneesState> {
                                     style: TextStyle(
                                         color: item.isLocked
                                             ? textColorDisabled
-                                            : Colors.black,
+                                            : isDarkMode
+                                                ? Colors.white
+                                                : Colors.black,
                                         fontWeight: FontWeight.bold,
                                         fontSize: 25),
                                   ),
@@ -354,17 +347,19 @@ class FawaneesListview extends State<FawaneesState> {
                                     style: TextStyle(
                                         color: item.isLocked
                                             ? textColorDisabled
-                                            : Colors.black,
+                                            : isDarkMode
+                                                ? Colors.white
+                                                : Colors.black,
                                         fontWeight: FontWeight.normal,
                                         fontSize: 17),
                                   )
                                 ]),
                                 Container(
                                     height: 50,
-                                    child: VerticalDivider(
+                                    child: const VerticalDivider(
                                         color: Color(0xFFE0E0E0))),
-                                const SizedBox(
-                                  width: 10,
+                                 SizedBox(
+                                   width: width *0.05,
                                 ),
                                 Column(children: [
                                   Row(children: [
@@ -377,7 +372,9 @@ class FawaneesListview extends State<FawaneesState> {
                                               color: item.isLocked
                                                   ? textColorDisabled
                                                   : item.isAdded
-                                                      ? Colors.black
+                                                      ? (isDarkMode
+                                                          ? Colors.white
+                                                          : Colors.black)
                                                       : textColorOrange,
                                               fontWeight: FontWeight.bold,
                                               fontSize: 22),
@@ -394,7 +391,9 @@ class FawaneesListview extends State<FawaneesState> {
                                           color: item.isLocked
                                               ? textColorDisabled
                                               : item.isAdded
-                                                  ? Colors.black
+                                                  ? (isDarkMode
+                                                      ? Colors.white
+                                                      : Colors.black)
                                                   : textColorOrange,
                                           fontWeight: FontWeight.normal,
                                           fontSize: 17),
@@ -413,219 +412,221 @@ class FawaneesListview extends State<FawaneesState> {
                                   ),
                                   Text(
                                     item.validty,
-                                    style:  TextStyle(
+                                    style: TextStyle(
                                         color: item.isLocked
                                             ? textColorDisabled
-                                            : Colors.black,
+                                            : (isDarkMode
+                                                ? Colors.white
+                                                : Colors.black),
                                         fontWeight: FontWeight.normal,
                                         fontSize: 15),
                                   ),
                                 ]),
-                                const SizedBox(
-                                  width: 10,
+                                 SizedBox(
+                                   width: width *0.05,
                                 ),
                                 Container(
                                     height: 50,
                                     child: VerticalDivider(
                                         color: Color(0xFFE0E0E0))),
-                                const SizedBox(
-                                  width: 40,
+                                 SizedBox(
+                                   width: width *0.05,
                                 ),
                                 GestureDetector(
                                     onTap: () {},
-                                    child: Text(item.isAdded ? "Added" : "Get",
+                                    child: AutoSizeText(item.isAdded ? "Added" : "Get",
                                         style: TextStyle(
                                           fontSize: 17,
                                           color: item.isLocked
                                               ? textColorDisabled
                                               : item.isAdded
-                                                  ? Colors.black
+                                                  ? (isDarkMode
+                                                      ? Colors.white
+                                                      : Colors.black)
                                                   : textColorOrange,
                                         )))
                               ]),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ))
-                ],
-              ),
-              Container(
-                margin: const EdgeInsets.only(
-                    top: 10.0, bottom: 10.0, left: 20.0, right: 20.0),
-                height: 1,
-                color: const Color(0xFFDDDDDD),
-              ),
-              Row(
-                children: [
-                  SizedBox(
-                    width: 20,
-                  ),
-                  Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Container(
-                            child: Text(
-                              "Get",
-                              style: TextStyle(
-                                  color: textColorOrange,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 25),
                             ),
-                          ),
+                          ],
                         ),
-                        Text(
-                          "The \nChance",
-                          style: TextStyle(
-                              color: textColorOrange,
-                              fontWeight: FontWeight.normal,
-                              fontSize: 17),
-                        )
-                      ]),
-                  Expanded(
+                      ),
+                    ],
+                  ))
+              ],
+            ),
+            Container(
+              margin: const EdgeInsets.only(
+                  top: 10.0, bottom: 10.0, left: 20.0, right: 20.0),
+              height: 1,
+              color: const Color(0xFFDDDDDD),
+            ),
+            Row(
+              children: [
+                SizedBox(
+                  width: 20,
+                ),
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Align(
+                    alignment: Alignment.centerLeft,
                     child: Container(
-                      margin: EdgeInsets.only(right: 15, bottom: 10, left: 5),
-                      //You can use EdgeInsets like above
-                      child: const Text(
-                          'Get the chance to win daily prizes, as '
-                          'well as smartphones, smartwatches, and cash money, in the '
-                          'draw that will take place on 01.05.2023',
-                          textAlign: TextAlign.justify,
-                          style: TextStyle(
-                            fontSize: 14,
-                          )),
+                      child: Text(
+                        "Get",
+                        style: TextStyle(
+                            color: textColorOrange,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 25),
+                      ),
                     ),
                   ),
-                ],
-              ),
-              ListView(
-                shrinkWrap: true,
-                primary: false,
-                scrollDirection: Axis.vertical,
-                children: [
-                  // showing list of images
-                  for (var item in fawaneesStaticList)
-                    Center(
-                        child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Container(
-                          child: Stack(
-                            children: [
-                              FittedBox(fit: BoxFit.fitWidth),
-                              Image.asset('assets/images/card_bg_fawanees.png'),
-                              Row(children: [
-                                const SizedBox(
-                                  width: 40,
-                                  height: 120,
+                  Text(
+                    "The \nChance",
+                    style: TextStyle(
+                        color: textColorOrange,
+                        fontWeight: FontWeight.normal,
+                        fontSize: 17),
+                  )
+                ]),
+                Expanded(
+                  child: Container(
+                    margin: EdgeInsets.only(right: 15, bottom: 10, left: 5),
+                    //You can use EdgeInsets like above
+                    child: Text(
+                      'Get the chance to win daily prizes, as '
+                      'well as smartphones, smartwatches, and cash money, in the '
+                      'draw that will take place on 01.05.2023',
+                      textAlign: TextAlign.justify,
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            ListView(
+              shrinkWrap: true,
+              primary: false,
+              scrollDirection: Axis.vertical,
+              children: [
+                // showing list of images
+                for (var item in fawaneesStaticList)
+                  Center(
+                      child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                        child: Stack(
+                          children: [
+                            FittedBox(fit: BoxFit.fitWidth),
+                            isDarkMode
+                                ? Image.asset('assets/images/bg_card_dark.png')
+                                : Image.asset('assets/images/bg_card.png'),
+                            Row(children: [
+                              const SizedBox(
+                                width: 40,
+                                height: 120,
+                              ),
+                              Column(children: [
+                                Text(
+                                  item.numberOfFanwos,
+                                  style: TextStyle(
+                                      color: textColorDisabled,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 25),
                                 ),
-                                Column(children: [
-                                  Text(
-                                    item.numberOfFanwos,
-                                    style: TextStyle(
-                                        color: textColorDisabled,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 25),
+                                const Padding(
+                                  padding: EdgeInsets.all(
+                                      5), //apply padding to all four sides
+                                ),
+                                Text(
+                                  "Fawanees",
+                                  style: TextStyle(
+                                      color: textColorDisabled,
+                                      fontWeight: FontWeight.normal,
+                                      fontSize: 17),
+                                )
+                              ]),
+                              Container(
+                                  height: 50,
+                                  child: VerticalDivider(
+                                      color: Color(0xFFE0E0E0))),
+                              const SizedBox(
+                                width: 10,
+                              ),
+                              Column(children: [
+                                Row(children: [
+                                  Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Container(
+                                      child: Text(
+                                        item.data,
+                                        style: TextStyle(
+                                            color: textColorDisabled,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 22),
+                                      ),
+                                    ),
                                   ),
                                   const Padding(
                                     padding: EdgeInsets.all(
-                                        5), //apply padding to all four sides
+                                        1), //apply padding to all four sides
                                   ),
                                   Text(
-                                    "Fawanees",
+                                    item.dataUnit,
                                     style: TextStyle(
                                         color: textColorDisabled,
                                         fontWeight: FontWeight.normal,
                                         fontSize: 17),
-                                  )
-                                ]),
-                                Container(
-                                    height: 50,
-                                    child: VerticalDivider(
-                                        color: Color(0xFFE0E0E0))),
-                                const SizedBox(
-                                  width: 10,
-                                ),
-                                Column(children: [
-                                  Row(children: [
-                                    Align(
-                                      alignment: Alignment.centerLeft,
-                                      child: Container(
-                                        child: Text(
-                                          item.data,
-                                          style: TextStyle(
-                                              color: textColorDisabled,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 22),
-                                        ),
-                                      ),
-                                    ),
-                                    const Padding(
-                                      padding: EdgeInsets.all(
-                                          1), //apply padding to all four sides
-                                    ),
-                                    Text(
-                                      item.dataUnit,
-                                      style: TextStyle(
-                                          color: textColorDisabled,
-                                          fontWeight: FontWeight.normal,
-                                          fontSize: 17),
-                                    ),
-                                    const Text(
-                                      "        ",
-                                      style: TextStyle(
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.normal,
-                                          fontSize: 15),
-                                    ),
-                                  ]),
-                                  const Padding(
-                                    padding: EdgeInsets.all(
-                                        2), //apply padding to all four sides
                                   ),
-                                  Text(
-                                    item.validty,
+                                  const Text(
+                                    "        ",
                                     style: TextStyle(
-                                        color: textColorDisabled,
+                                        color: Colors.black,
                                         fontWeight: FontWeight.normal,
                                         fontSize: 15),
                                   ),
                                 ]),
+                                const Padding(
+                                  padding: EdgeInsets.all(
+                                      2), //apply padding to all four sides
+                                ),
+                                Text(
+                                  item.validty,
+                                  style: TextStyle(
+                                      color: textColorDisabled,
+                                      fontWeight: FontWeight.normal,
+                                      fontSize: 15),
+                                ),
                               ]),
-                            ],
-                          ),
-                        ),
-                      ],
-                    )),
-                ],
-              ),
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
-                child: Center(
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(
-                        minWidth: double.infinity, minHeight: 34),
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor: Colors.white,
-                        //change background color of button
-                        backgroundColor: buttonColorOrange,
-                        //change text color of button
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(5),
+                            ]),
+                          ],
                         ),
                       ),
-                      onPressed: () {},
-                      child: const Text('Done'),
+                    ],
+                  )),
+              ],
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(
+                      minWidth: double.infinity, minHeight: 34),
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      //change background color of button
+                      backgroundColor: buttonColorOrange,
+                      //change text color of button
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5),
+                      ),
                     ),
+                    onPressed: () {},
+                    child: const Text('Done'),
                   ),
                 ),
-              )
-            ],
-          ),
+              ),
+            )
+          ],
         ),
       ),
     );

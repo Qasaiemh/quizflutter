@@ -1,97 +1,16 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:untitled/fawanees.dart';
 import 'package:untitled/model.dart';
-import 'package:animated_text_kit/animated_text_kit.dart';
 
-import 'ScopeModelWrapper.dart';
-import 'Translations.dart';
-import 'TranslationsDelegate.dart';
-
-void main() => runApp(new ScopeModelWrapper());
+import 'util/localization/Translations.dart';
+import 'package:lottie/lottie.dart';
 
 bool firstRun = true;
 
 enum Direction { vertical, horizontal }
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  // This widget is the root of your application.
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.blue,
-      ),
-      home: const Scaffold(body: QuestionWidget()),
-    );
-  }
-}
-
-class _MyHomePageState extends State<QuestionWidget>
-    with TickerProviderStateMixin {
-  late AnimationController _animationController;
-  late Animation<double> _animation;
-
-  @override
-  void initState() {
-    super.initState();
-    _animationController =
-        AnimationController(vsync: this, duration: const Duration(seconds: 10))
-          ..forward();
-    _animation = Tween(begin: 0.0, end: 1.0).animate(
-        CurvedAnimation(parent: _animationController, curve: Curves.linear));
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
-    double height = size.height;
-    double width = size.width;
-
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(''),
-      ),
-      body: Stack(
-        alignment: Alignment.topCenter,
-        children: [
-          SizedBox(width: size.width, height: size.height),
-          Image.asset(
-            'assets/images/animated_tile.png',
-            width: width,
-          ),
-          AnimatedBuilder(
-              animation: _animation,
-              builder: (context, widget) {
-                return Transform.translate(
-                    offset: Offset(0, -_animation.value * height / 3),
-                    child: Transform.scale(
-                      scaleY: .5 - _animation.value,
-                      scaleX: 2,
-                      child: Image.asset(
-                        'assets/images/animated_bg.png',
-                        height: height,
-                      ),
-                    ));
-              })
-        ],
-      ),
-    );
-  }
-}
 
 class QuestionWidget extends StatefulWidget {
   const QuestionWidget({
@@ -110,36 +29,62 @@ class _HomeWidgetState extends State<QuestionWidget> {
 
   @override
   Widget build(BuildContext context) {
+    bool isDarkMode =
+        MediaQuery.of(context).platformBrightness == Brightness.dark;
+
     return Container(
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.white,
+          backgroundColor: Colors.transparent,
           leading: IconButton(
-            icon: Icon(Icons.arrow_back, color: Colors.black),
+            icon: Icon(Icons.arrow_back),
             onPressed: () => Navigator.of(context).pop(),
           ),
           title: Text(
             Translations.of(context)!.title,
-            style: TextStyle(color: Colors.black, fontWeight: FontWeight.w700),
+            style: Theme.of(context).textTheme.titleMedium,
           ),
           elevation: 0,
         ),
         body: Stack(
           children: [
+            isDarkMode
+                ? SvgPicture.asset(
+                    'assets/images/bg_fawanees_dark.svg',
+                    fit: BoxFit.cover,
+                  )
+                : Image.asset(
+                    'assets/images/bg_athkar.png',
+                    fit: BoxFit.cover,
+                  ),
             Container(
-              decoration: const BoxDecoration(
-                  color: Colors.white,
-                  image: DecorationImage(
-                      fit: BoxFit.fill,
-                      image: AssetImage('assets/images/bg_athkar.png'))),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  TileWidget(numberOfDay: 2),
-                  const SizedBox(height: 32),
-                  Expanded(child: ListViewStateFull(setElevatedButton)),
-                ],
+                children: [],
               ),
+            ),
+            Container(
+              width: double.infinity,
+              child: isDarkMode
+                  ? Lottie.asset(
+                      "assets/images/animated_bg_dark.json",
+                      repeat: false,
+                      fit: BoxFit.fitWidth,
+                    )
+                  : Lottie.asset(
+                      "assets/images/animated_bg.json",
+                      repeat: false,
+                      fit: BoxFit.fitWidth,
+                    ),
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                const SizedBox(height: 50),
+                TileWidget(numberOfDay: 2),
+                const SizedBox(height: 100),
+                Expanded(child: ListViewStateFull(setElevatedButton)),
+              ],
             ),
           ],
         ),
@@ -160,13 +105,16 @@ class TileWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
+    double height = MediaQuery.of(context).size.height;
+
     return Padding(
         padding: const EdgeInsets.only(right: 0, left: 0, top: 15, bottom: 15),
         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Image.asset(
             'assets/images/artwork_fawanees.png',
-            width: 100,
-            height: 100,
+            width: width/6,
+            height: width/5,
           ),
           Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             SlideFadeTransition(
@@ -174,29 +122,26 @@ class TileWidget extends StatelessWidget {
                 offset: 2,
                 direction: Direction.horizontal,
                 child: Text(
-                  Translations.of(context)!.numberOfRamadanDay,
-                  style: const TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 19),
+                  "${Translations.of(context)!.numberOfRamadanDay} $numberOfDay",
+                  style: Theme.of(context).textTheme.titleMedium,
                 )),
-            const Padding(
-              padding: EdgeInsets.all(10), //apply padding to all four sides
-            ),
             SlideFadeTransition(
-                delayStart: Duration(milliseconds: 200),
-                offset: 2,
-                direction: Direction.horizontal,
-                child: Expanded(
-                    child: Container(
-                        child: Text(
-                  Translations.of(context)!.fawaneesDescription,
-                  textAlign: TextAlign.justify,
-                  style: const TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.normal,
-                      fontSize: 17),
-                ))))
+              delayStart: Duration(milliseconds: 200),
+              offset: 2,
+              direction: Direction.horizontal,
+              child: Expanded(
+                child: Container(
+                  width:width*.75 ,
+                  margin: EdgeInsets.only(top: 10,right: 15, bottom: 10, left: 0),
+                  //You can use EdgeInsets like above
+                  child: Text(
+                    overflow: TextOverflow.clip,
+                    Translations.of(context)!.fawaneesDescription,
+                    style: Theme.of(context).textTheme.titleSmall,
+                  ),
+                ),
+              ),
+            )
           ]),
         ]));
   }
@@ -229,14 +174,11 @@ class ListViewHome extends State<ListViewStateFull> {
 
   static bool isScreenBlocked = false;
 
-  Color selectedColor = const Color(0xFFB7B7B7);
-  Color selectedColorCorrectBgWhite = const Color(0xFFFFFFFF);
   Color selectedColorCorrectBgGreen = const Color(0xFF55DD53);
   Color wrongBottomSheetBg = const Color(0xFF333333);
 
   Color selectedColorOrange = const Color(0xFFF16E01);
   Color selectedColorRed = const Color(0xFFF03434);
-  Color unSelectedColor = const Color(0xFFFFFFFF);
   Color unSelectedColor2 = const Color(0xFF9E9E9E);
 
   _onSelected(int index) {
@@ -246,6 +188,13 @@ class ListViewHome extends State<ListViewStateFull> {
 
   @override
   Widget build(BuildContext context) {
+    bool isDarkMode =
+        MediaQuery.of(context).platformBrightness == Brightness.dark;
+    Color selectedColorCorrectBgWhite =
+        isDarkMode ? Colors.black : Color(0xFFFFFFFF);
+
+    Color themeColor = isDarkMode ? Color(0xFF2F2F2F) : Color(0xFFFFFFFF);
+
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Column(
@@ -284,7 +233,7 @@ class ListViewHome extends State<ListViewStateFull> {
                                             : selectedColorRed)
                                     : selectedColorCorrectBgWhite),
                             borderRadius: BorderRadius.circular(10),
-                            color: unSelectedColor),
+                            color: themeColor),
                         child: ListTile(
                           leading: ConstrainedBox(
                               constraints: const BoxConstraints(
@@ -335,7 +284,9 @@ class ListViewHome extends State<ListViewStateFull> {
                                               : answer == Answer.wrong &&
                                                       _selectedIndex == index
                                                   ? selectedColorRed
-                                                  : Colors.black,
+                                                  : isDarkMode
+                                                      ? Colors.white
+                                                      : Colors.black,
                               fontWeight: FontWeight.normal,
                             ),
                           ),
@@ -382,6 +333,7 @@ class ListViewHome extends State<ListViewStateFull> {
                           });
                           Timer(const Duration(milliseconds: 500), () {
                             showModalBottomSheet<void>(
+                              backgroundColor: themeColor,
                               context: context,
                               enableDrag: true,
                               isDismissible: false,
@@ -418,14 +370,12 @@ class ListViewHome extends State<ListViewStateFull> {
                                         ),
                                         const Padding(
                                             padding: EdgeInsets.all(2)),
-                                        const Text(
+                                        Text(
                                           'New Fanows had been added \nfor you',
                                           textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                            fontSize: 17,
-                                            color: Colors.black,
-                                            fontWeight: FontWeight.normal,
-                                          ),
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .titleSmall,
                                         ),
                                         const Padding(
                                             padding: EdgeInsets.all(2)),
@@ -438,28 +388,34 @@ class ListViewHome extends State<ListViewStateFull> {
                                                   minWidth: double.infinity,
                                                   minHeight: 34),
                                               child: OutlinedButton(
-                                                style: ElevatedButton.styleFrom(
-                                                  foregroundColor: Colors.white,
-                                                  side: const BorderSide(
-                                                      width: 1.0),
-                                                  //change background color of button
-                                                  //change text color of button
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            5),
+                                                  style:
+                                                      ElevatedButton.styleFrom(
+                                                    side: BorderSide(
+                                                        color: Theme.of(context)
+                                                            .primaryColor,
+                                                        width: 1.0),
+                                                    //change background color of button
+                                                    //change text color of button
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              5),
+                                                    ),
                                                   ),
-                                                ),
-                                                child: const Text(
-                                                  'REDEEM FAWANEES',
-                                                  style: TextStyle(
-                                                    color: Colors.black,
-                                                    fontWeight: FontWeight.bold,
+                                                  child: Text(
+                                                    'REDEEM FAWANEES',
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .titleSmall,
                                                   ),
-                                                ),
-                                                onPressed: () =>
-                                                    Navigator.pop(context),
-                                              ),
+                                                  onPressed: () =>
+                                                      Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                            builder: (context) =>
+                                                                FawaneesWidget()),
+                                                      )),
                                             ),
                                           ),
                                         ),
@@ -509,110 +465,103 @@ class ListViewHome extends State<ListViewStateFull> {
                         } else {
                           setState(() {
                             answer = Answer.wrong;
-                            showBottomSheet(
+                            Timer(const Duration(milliseconds: 500), () {
+                              showModalBottomSheet<void>(
+                                backgroundColor: themeColor,
+                                context: context,
+                                enableDrag: true,
+                                isDismissible: false,
                                 shape: const RoundedRectangleBorder(
                                   borderRadius: BorderRadius.vertical(
-                                    top: Radius.circular(20),
+                                    top: Radius.circular(25.0),
                                   ),
                                 ),
-                                context: context,
-                                builder: (context) => Container(
-                                      height: 250,
-                                      child: Container(
-                                          decoration: BoxDecoration(
-                                              color: wrongBottomSheetBg,
-                                              borderRadius:
-                                                  const BorderRadius.only(
-                                                      topLeft:
-                                                          Radius.circular(20.0),
-                                                      topRight: Radius.circular(
-                                                          20.0))),
-                                          child: Center(
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: <Widget>[
-                                                const Padding(
-                                                    padding:
-                                                        EdgeInsets.all(10)),
-                                                const Text(
-                                                  'Wrong Answer',
-                                                  style: TextStyle(
-                                                    fontSize: 24,
-                                                    color: Colors.red,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                                const Padding(
-                                                    padding:
-                                                        EdgeInsets.all(10)),
-                                                const Text(
-                                                  'We hope you get a correct answer \nnext time.',
-                                                  textAlign: TextAlign.center,
-                                                  style: TextStyle(
-                                                    fontSize: 17,
-                                                    color: Colors.white,
-                                                    fontWeight:
-                                                        FontWeight.normal,
-                                                  ),
-                                                ),
-                                                const Padding(
-                                                    padding:
-                                                        EdgeInsets.all(10)),
-                                                Padding(
-                                                  padding: const EdgeInsets
-                                                          .symmetric(
-                                                      vertical: 2,
-                                                      horizontal: 7),
-                                                  child: Center(
-                                                    child: ConstrainedBox(
-                                                      constraints:
-                                                          const BoxConstraints(
-                                                              minWidth: double
-                                                                  .infinity,
-                                                              minHeight: 34),
-                                                      child: OutlinedButton(
-                                                        style: ElevatedButton
-                                                            .styleFrom(
-                                                          foregroundColor:
-                                                              Colors.white,
-                                                          side:
-                                                              const BorderSide(
-                                                                  color: Colors
-                                                                      .white,
-                                                                  width: 1.0),
-                                                          //change background color of button
-                                                          //change text color of button
-                                                          shape:
-                                                              RoundedRectangleBorder(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        5),
-                                                          ),
-                                                        ),
-                                                        child: const Text(
-                                                          'DONE',
-                                                          style: TextStyle(
-                                                            color: Colors.white,
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                          ),
-                                                        ),
-                                                        onPressed: () =>
-                                                            Navigator.pop(
-                                                                context),
-                                                      ),
+                                builder: (BuildContext context) {
+                                  return SizedBox(
+                                    height: 300,
+                                    child: Center(
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: <Widget>[
+                                          const Padding(
+                                              padding: EdgeInsets.all(10)),
+                                          Image.asset(
+                                            'assets/images/artwork_fawanees.png',
+                                            width: 65,
+                                            height: 65,
+                                          ),
+                                          const Padding(
+                                              padding: EdgeInsets.all(10)),
+                                          const Text(
+                                            'Wrong Answer',
+                                            style: TextStyle(
+                                              fontSize: 24,
+                                              color: Colors.red,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          const Padding(
+                                              padding: EdgeInsets.all(2)),
+                                          Text(
+                                            'We hope you get a correct answer \nnext time.',
+                                            textAlign: TextAlign.center,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .titleSmall,
+                                          ),
+                                          const Padding(
+                                              padding: EdgeInsets.all(2)),
+                                          Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                vertical: 2, horizontal: 10),
+                                            child: Center(
+                                              child: ConstrainedBox(
+                                                constraints:
+                                                    const BoxConstraints(
+                                                        minWidth:
+                                                            double.infinity,
+                                                        minHeight: 34),
+                                                child: ElevatedButton(
+                                                  style:
+                                                      ElevatedButton.styleFrom(
+                                                    foregroundColor:
+                                                        Colors.white,
+                                                    backgroundColor:
+                                                        selectedColorOrange,
+                                                    //change background color of button
+                                                    //change text color of button
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              5),
                                                     ),
                                                   ),
+                                                  child: const Text(
+                                                    'Done',
+                                                    style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                  onPressed: () =>
+                                                      Navigator.pop(context),
                                                 ),
-                                                const Padding(
-                                                    padding: EdgeInsets.all(7)),
-                                              ],
+                                              ),
                                             ),
-                                          )),
-                                    ));
+                                          ),
+                                          const Padding(
+                                              padding: EdgeInsets.all(7)),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                },
+                              );
+                            });
                           });
                         }
                       }
@@ -743,7 +692,11 @@ class _ShapeTransitionState extends State<ShapeTransitionWidget>
     _animationController = AnimationController(
       vsync: this,
       duration: Duration(seconds: 2),
-    )..forward();
+    )
+      ..forward()
+      ..addStatusListener((status) {
+        if (status == AnimationStatus.completed) {}
+      });
 
     _animationFade = Tween<double>(begin: 0, end: 1.0).animate(CurvedAnimation(
       curve: Curves.linear,
